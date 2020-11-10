@@ -1,4 +1,4 @@
-from input_data_sorter import *
+from eda.input_data_sorter import *
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
