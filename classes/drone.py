@@ -11,14 +11,16 @@ class Drone:
         self.turns = 0
         self.actions = []
 
-    def load(self, item):
-        self.items.append(item)
+    def load(self, products_type, products_quantity):
+        self.products_type.append(products_type)
+        self.products_quantity.append(products_quantity)
 
-    def unload(self):
-        self.items.remove(item)
+    def unload(self, products_type, products_quantity):
+        self.products_type.remove(products_type)
+        self.products_quantity.remove(products_quantity)
+       
     
     def deliver(self):
-
 
     def wait(self):
 
