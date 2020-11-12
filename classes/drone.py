@@ -1,35 +1,43 @@
-# This is the drone class
+from classes.dataframes import *
 
-class Drone():  # inherit                   #product #warehouse #order (#utility)
+
+class Drone():  # inherit #product #warehouse #order (#utility)
 
     def __init__(self, num):
         self.num = num
         self.products_type = []
         self.products_quantity = []
-        #  self.items = []         #List[[n, pt]]
         self.pld_mass = 0
         self.cur_pos = [0, 0]
         self.turns = 0  # ?
         self.actions = []  # ?
         self.busy = False
 
+        # Df for use throughout
+        self.Data = Dataframes()
+
     def load(self, prod_type, qnty):
-        self.items.append([qnty, prod_type])
+        self.products_type.append(prod_type)
+        self.products_quantity.append(qnty)
         # pactions.append([0 L 1 2 3 ]) ?order_number
         self.turns += 1
 
     def unload(self, prod_type, qnty):  # warehouse
-        self.items.remove([qnty, prod_type])
+        self.products_type.remove(prod_type)
+        self.products_quantity.remove(qnty)
         # actions.append([0 U 1 2 3 ])?order_number
         self.turns += 1
 
-    # def unpdate_pld_mass(self):
-    # for i in items:
-    # weight += dao.get_weight(item)
-    # pld_mass = weight
+    def unpdate_pld_mass(self):
+        tot_weight = 0
+        for i in range(len(self.products_type)):
+            unit_weight = self.Data.weight_prod_types[self.products_type[i]]
+            tot_weight += unit_weight * self.products_quantity[i]
+        self.pld_mass = tot_weight
 
     def deliver(self, prod_type, qnty):  # to the order
-        self.items.remove([qnty, prod_type])
+        self.products_type.remove(prod_type)
+        self.products_quantity.remove(qnty)
         # actions.append([0 D 1 2 3 ])?order_number
         self.turns += 1
 
@@ -43,3 +51,4 @@ class Drone():  # inherit                   #product #warehouse #order (#utility
         self.cur_pos = new_pos  # define in utility class
 
     #account for distance in the count of turns for delivery
+
