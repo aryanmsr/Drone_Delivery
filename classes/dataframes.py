@@ -26,4 +26,14 @@ class Dataframes:
                                  columns=["X", "Y", "N of Items"])
         return df_orders
 
+    def get_df_wareouses(self):
+        wrhs_x = [self.wrhs_info[i][0][0] for i in range(len(self.wrhs_info))]
+        wrhs_y = [self.wrhs_info[i][0][1] for i in range(len(self.wrhs_info))]
+        n_items_per_product_type = [self.wrhs_info[i][1] for i in range(len(self.wrhs_info))]
+        df_wrhs = pd.DataFrame(list(zip(wrhs_x, wrhs_y, n_items_per_product_type)),
+                               columns=["X", "Y", "Items per Prod Type"])
+        return df_wrhs
+
+
+
     # get the location based on order types

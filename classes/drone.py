@@ -1,4 +1,6 @@
 from classes.dataframes import *
+import numpy as np
+from classes.utility import *
 
 
 class Drone():  # inherit #product #warehouse #order (#utility)
@@ -15,6 +17,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
 
         # Df for use throughout
         self.Data = Dataframes()
+        # self.Util = Utility()
 
     def load(self, prod_type, qnty):
         self.products_type.append(prod_type)
@@ -52,3 +55,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
 
     #account for distance in the count of turns for delivery
 
+    def find_nearest_wh(self, warehouses):
+        wh = np.array([warehouses[x].position for x in warehouses], dtype=np.float64)
+        d = dist(self.cur_pos, wh)
+        return warehouses[np.argmin(d)]
