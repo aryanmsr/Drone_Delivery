@@ -1,5 +1,7 @@
 from classes.dataframes import *
 
+# TODO intialize simulation
+
 # initialize all dataframes
 data = Dataframes()
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
+from classes.dataframes import *
 
 sns.set()
 
@@ -61,3 +62,9 @@ sns.set(rc = {'figure.figsize':(11.7, 8.27)})                    #number of item
 sns.displot(df2["Product Type"], bins=[i for i in range(n_prod_types)])
 plt.title("Number of Items per Product Type in all Orders")
 plt.show()
+
+# -- Dataframe for Warehouses
+
+data = Dataframes()
+df_wrhs = data.get_df_wareouses()
+print(df_wrhs)

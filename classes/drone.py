@@ -24,6 +24,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         self.products_quantity.append(qnty)
         # pactions.append([0 L 1 2 3 ]) ?order_number
         self.turns += 1
+        # TODO update payload mass
 
     def unload(self, prod_type, qnty):  # warehouse
         self.products_type.remove(prod_type)
@@ -59,3 +60,6 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         wh = np.array([warehouses[x].position for x in warehouses], dtype=np.float64)
         d = dist(self.cur_pos, wh)
         return warehouses[np.argmin(d)]
+
+    def check_pld_weight(self):
+        return self.pld_mass <= 200

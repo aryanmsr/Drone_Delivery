@@ -12,10 +12,10 @@ class Order:
         # weight product types - initialized @ beginning of sim
 
         self.amount = amount
-       self.num = num
-       self.position = [x, y]
-       self.completed = False
-       self.turn_order_completed = 0
+        self.num = num
+        self.position = [x, y]
+        self.completed = False
+        self.turn_order_completed = 0
 
         self.weights = np.array(weight_prod_types)
         self.tot_weight = self.weights[types].sum()
@@ -30,8 +30,7 @@ class Order:
         # self.products_quantity = pd.Series(self.products_type, columns = 'type').groupby('type').count()
         # self.prod_weights = weights[types]
 
-    # TO-DO: improve this method
-
+    # TODO: improve this method
     def remove_prod(self, prod_type, prod_qnt):
         self.prod_type.remove(prod_type)
         self.prod_amounts.drop(prod_qnt)
