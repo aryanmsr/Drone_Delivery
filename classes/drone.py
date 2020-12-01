@@ -3,12 +3,12 @@ import numpy as np
 from classes.utility import *
 
 
-class Drone():  # inherit #product #warehouse #order (#utility)
+class Drone(object):  # inherit #product #warehouse #order (#utility)
 
     def __init__(self, num):
         self.num = num
-        self.products_type = []
-        self.products_quantity = []
+        self.prod_types = []
+        self.prod_amounts = []
         self.pld_mass = 0
         self.cur_pos = [0, 0]
         self.turns = 0  # ?
@@ -19,29 +19,32 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         self.Data = Dataframes()
         # self.Util = Utility()
 
-    def load(self, prod_type, qnty):
-        self.products_type.append(prod_type)
-        self.products_quantity.append(qnty)
+    def __repr__(self):
+        return '(num: ' + str(self.num) + ', ' + 'payload_weight: ' + str(sum(self.prod_types)) + ')'
+
+    def load(self, prod_types, qnty):
+        self.prod_types.append(prod_types)
+        self.prod_amounts.append(qnty)
         # pactions.append([0 L 1 2 3 ]) ?order_number
         self.turns += 1
         # TODO update payload mass
 
-    def unload(self, prod_type, qnty):  # warehouse
-        self.products_type.remove(prod_type)
-        self.products_quantity.remove(qnty)
+    def unload(self, prod_types, qnty):  # warehouse
+        self.prod_types.remove(prod_types)
+        self.prod_amounts.remove(qnty)
         # actions.append([0 U 1 2 3 ])?order_number
         self.turns += 1
 
     def unpdate_pld_mass(self):
         tot_weight = 0
-        for i in range(len(self.products_type)):
-            unit_weight = self.Data.weight_prod_types[self.products_type[i]]
-            tot_weight += unit_weight * self.products_quantity[i]
+        for i in range(len(self.prod_types)):
+            unit_weight = self.Data.weight_prod_types[self.prod_types[i]]
+            tot_weight += unit_weight * self.prod_amounts[i]
         self.pld_mass = tot_weight
 
     def deliver(self, prod_type, qnty):  # to the order
-        self.products_type.remove(prod_type)
-        self.products_quantity.remove(qnty)
+        self.prod_types.remove(prod_type)
+        self.prod_amounts.remove(qnty)
         # actions.append([0 D 1 2 3 ])?order_number
         self.turns += 1
 
@@ -54,7 +57,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
     def update_cur_pos(self, new_pos):
         self.cur_pos = new_pos  # define in utility class
 
-    #account for distance in the count of turns for delivery
+    # account for distance in the count of turns for delivery
 
     def find_nearest_wh(self, warehouses):
         wh = np.array([warehouses[x].position for x in warehouses], dtype=np.float64)

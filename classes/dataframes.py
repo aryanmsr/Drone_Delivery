@@ -2,7 +2,7 @@ from eda.input_data_sorter import sort_data
 import pandas as pd
 
 
-class Dataframes:
+class Dataframes(object):
 
     def __init__(self):
         data = sort_data("../eda/busy_day.in")
@@ -26,14 +26,15 @@ class Dataframes:
                                  columns=["X", "Y", "N of Items"])
         return df_orders
 
-    def get_df_wareouses(self):
+    def get_df_wrhs(self):
         wrhs_x = [self.wrhs_info[i][0][0] for i in range(len(self.wrhs_info))]
         wrhs_y = [self.wrhs_info[i][0][1] for i in range(len(self.wrhs_info))]
         n_items_per_product_type = [self.wrhs_info[i][1] for i in range(len(self.wrhs_info))]
         df_wrhs = pd.DataFrame(list(zip(wrhs_x, wrhs_y, n_items_per_product_type)),
-                               columns=["X", "Y", "Items per Prod Type"])
+                               columns=["X", "Y", "Amounts"])
         return df_wrhs
 
+# 0 0 0 0 0 0 0
 
 
     # get the location based on order types

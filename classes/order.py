@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import collections
 
-class Order:
+
+class Order(object):
 
     def __init__(self, num, x, y, amount, types, weight_prod_types):
         # x - location
@@ -30,10 +31,15 @@ class Order:
         # self.products_quantity = pd.Series(self.products_type, columns = 'type').groupby('type').count()
         # self.prod_weights = weights[types]
 
-    # TODO: improve this method
+    # TODO: improve remove method, but watch out because it's used in main_sim
     def remove_prod(self, prod_type, prod_qnt):
-        self.prod_type.remove(prod_type)
-        self.prod_amounts.drop(prod_qnt)
+        # self.prod_type.remove(prod_type), should be sufficient to simply undate the quantities
+        self.prod_amounts.iloc[prod_type]["Amounts"] = 0
+
+    def check_completed(self):
+        return self.prod_amounts["Amounts"].sum == 0
+
 
 # ord = Order(1, 23, 34, 5, [1, 1, 2, 3, 4], [1, 1, 1, 1, 1])
 # print(ord.prod_amounts)
+# print(ord.prod_amounts.loc[ord.prod_amounts["Types"]==1]["Amounts"])
