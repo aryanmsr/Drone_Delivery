@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from classes.utility import *
 
 
@@ -47,7 +48,7 @@ class Warehouse(object):
     def check_avail2(self, prod_type, prod_qnty):
         # checking for the quantity
         return self.prod_amounts[
-                   self.prod_amounts.index == prod_type - 1] >= prod_qnty  # -1 to compensate for the offset between prod type and index :(
+                   self.prod_amounts.index == prod_type] >= prod_qnty  # -1 to compensate for the offset between prod type and index :(
 
 # wrh = Warehouse(1, 23, 34, [5, 6, 82, 3, 0], [10, 11, 22, 33, 44])
 # wrh.remove_product(2, 10)
