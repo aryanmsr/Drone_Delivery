@@ -42,7 +42,7 @@ for k in dronesdict.keys():
     # find nearest order
     nearest_order = wrhsdict[k].find_nearest_order(ordersdict)
     # check availability of each product type order in warehouse
-    print(nearest_order)
+    # print(nearest_order)
 
     #
     # for prod_type in nearest_order.prod_types:

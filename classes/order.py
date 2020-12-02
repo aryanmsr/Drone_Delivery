@@ -43,8 +43,6 @@ class Order(object):
     def check_completed(self):
         return self.prod_amounts["Amounts"].sum == 0
 
-    def check_avail(self, prod_types):  # prod_types  , prod_qnty
-        return np.any(pd.Series(prod_types).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index))
 
 
 # ord = Order(1, 23, 34, 5, [1, 1, 2, 3, 4], [1, 1, 1, 1, 1])

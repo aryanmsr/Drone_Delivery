@@ -30,7 +30,7 @@ class Warehouse(object):
     def find_nearest_order(self, orders):  # dictionary of orders
         o = np.array([orders[x].position for x in orders], dtype=np.float64)
         c = np.array([orders[x].completed for x in orders])
-        check_avail = np.array([self.check_avail(orders[x].prod_type) for x in orders])
+        check_avail = np.array([np.any(self.check_avail(orders[x].prod_types)) for x in orders])
 
         if c.sum() == 1250:
             return 'All orders are completed'
@@ -46,7 +46,7 @@ class Warehouse(object):
     # TODO consider integrating this check in find_nearest_order
     def check_avail(self, prod_types):  # prod_types  , prod_qnty
         # checking for the type
-        return np.any(pd.Series(prod_types).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index))
+        return pd.Series(prod_types).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index)
 
     # check product availability only based on quantity
     def check_avail2(self, prod_type, prod_qnty):
