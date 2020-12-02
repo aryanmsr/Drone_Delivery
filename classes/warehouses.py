@@ -26,29 +26,32 @@ class Warehouse(object):
     def remove_product(self, prod_type, prod_qnt):
         self.prod_amounts.loc[prod_type, "Amounts"] -= prod_qnt
 
+    #
     def find_nearest_order(self, orders):  # dictionary of orders
         o = np.array([orders[x].position for x in orders], dtype=np.float64)
         c = np.array([orders[x].completed for x in orders])
-        # check_avail  = np.array([orders[x] for x in orders])
+        check_avail = np.array([self.check_avail(orders[x].prod_type) for x in orders])
 
         if c.sum() == 1250:
             return 'All orders are completed'
+        # set distances to infinity of completed orders and orders not available
         o[c] = np.inf
+        o[~check_avail] = np.inf
+
         d = dist(self.position, o)
 
         # w = dist(self.position, o.warehouses)
         return orders[np.argmin(d)]
 
     # TODO consider integrating this check in find_nearest_order
-    def check_avail(self, prod_type):  # , prod_qnty
+    def check_avail(self, prod_types):  # prod_types  , prod_qnty
         # checking for the type
-        return np.any(pd.Series(prod_type).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index))
+        return np.any(pd.Series(prod_types).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index))
 
     # check product availability only based on quantity
     def check_avail2(self, prod_type, prod_qnty):
         # checking for the quantity
-        return self.prod_amounts[
-                   self.prod_amounts.index == prod_type] >= prod_qnty  # -1 to compensate for the offset between prod type and index :(
+        return self.prod_amounts.loc[self.prod_amounts.index == prod_type, "Amounts"].values[0] >= prod_qnty
 
 # wrh = Warehouse(1, 23, 34, [5, 6, 82, 3, 0], [10, 11, 22, 33, 44])
 # wrh.remove_product(2, 10)

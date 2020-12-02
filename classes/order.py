@@ -31,6 +31,10 @@ class Order(object):
         # self.products_quantity = pd.Series(self.products_type, columns = 'type').groupby('type').count()
         # self.prod_weights = weights[types]
 
+    def __repr__(self):
+        return '(num: ' + str(self.num) + ', ' + 'n_items: ' + str(
+            self.amount) + ', ' + 'tot_weight: ' + str(self.tot_weight) + ')'
+
     # TODO: improve remove method, but watch out because it's used in main_sim
     def remove_prod(self, prod_type, prod_qnt):
         # self.prod_type.remove(prod_type), should be sufficient to simply undate the quantities
@@ -38,6 +42,9 @@ class Order(object):
 
     def check_completed(self):
         return self.prod_amounts["Amounts"].sum == 0
+
+    def check_avail(self, prod_types):  # prod_types  , prod_qnty
+        return np.any(pd.Series(prod_types).isin(self.prod_amounts[self.prod_amounts["Amounts"] > 0].index))
 
 
 # ord = Order(1, 23, 34, 5, [1, 1, 2, 3, 4], [1, 1, 1, 1, 1])
