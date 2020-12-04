@@ -29,6 +29,7 @@ class Warehouse(object):
     #
     def find_nearest_order(self, orders):  # dictionary of orders
         o = np.array([orders[x].position for x in orders], dtype=np.float64)
+
         c = np.array([orders[x].completed for x in orders])
         check_avail = np.array([np.any(self.check_avail(orders[x].prod_types)) for x in orders])
 

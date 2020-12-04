@@ -6,7 +6,7 @@ from classes.utility import *
 from classes.order import *
 
 # initialize raw data
-raw_data = sort_data("../eda/busy_day.in")
+raw_data = sort_data("./eda/busy_day.in")
 grid_row, grid_col, n_drones, max_turns, max_payload, n_prod_types, weight_prod_types, n_wrhs, wrhs_info, n_orders, order_info = [
     raw_data[i] for i in range(11)]
 

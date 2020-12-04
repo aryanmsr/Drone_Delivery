@@ -5,7 +5,7 @@ import pandas as pd
 class Dataframes(object):
 
     def __init__(self):
-        data = sort_data("../eda/busy_day.in")
+        data = sort_data("./eda/busy_day.in")
         self.grid_row, \
         self.grid_col, \
         self.n_drones, \
