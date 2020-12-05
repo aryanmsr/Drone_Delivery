@@ -44,7 +44,7 @@ for i in dronesdict:
 # each drone at each warehouse
 
 # while t<=max_turns:
-while orders.completed.sum()<28:
+while orders.completed.sum()<100:
     for k in dronesdict:
     # for k in range(2):
         # find nearest order
@@ -57,19 +57,20 @@ while orders.completed.sum()<28:
         # t1 = time.time()
         # print(f'nearest_wh: {t1-t}')
         nearest_order = drone.find_nearest_order(orders, warehouses, nearest_warehouse)
-        # t2 = time.time()
+        types, qnty = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
+        t2 = time.time()
         # print(f'nearest_order: {t2-t1}')
         # check availability of each product type order in warehouse
-        types, qnty = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
-        # t3 = time.time()
-        # print(f'assign: {t3-t2}')
+        nearest_warehouse.update_availability(warehouses, orders)
+        t3 = time.time()
+        print(f'assign: {t3-t2}')
         drone.deliver_order(types, qnty, nearest_order, orders)
         # t4 = time.time()
         # print(f'deliver: {t4-t3}')
         # print(orders.completed.sum())
         # print(drone.turns)
         print(orders.completed.sum())
-        print(nearest_warehouse.prod_amounts.Amounts.sum(), nearest_warehouse.num)
+        # print(nearest_warehouse.prod_amounts.Amounts.sum(), nearest_warehouse.num)
     # avail_types = wrhsdict[k].select_avail_types(nearest_order.prod_types)
     # print(avail_types)
     # avail_qnty = wrhsdict[k].select_avail_quantities(avail_types, nearest_order.df.loc[avail_types])

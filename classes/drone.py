@@ -125,6 +125,7 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
         if c.sum() == 1250:
             return 'All orders are completed'
         order_pos[(c)|(~check_avail)] = np.inf
+        # print(f'avail_orders: {np.sum(order_pos==np.inf)}')
         d = dist(self.cur_pos, order_pos)
         nearest_order = orders.dict[np.argmin(d)]
         return nearest_order
@@ -156,8 +157,9 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
         # print(f'{warehouses.all_avail_orders[wrhs.num].sum()}')
         # print(f'{warehouses.all_avail_orders[}')
 
-        if not np.all(order.check_avail_types(wrhs.prod_amounts)):
-            warehouses.all_avail_orders[wrhs.num][order.num] = False
+        # if not np.all(order.check_avail_types(wrhs.prod_amounts)):
+        #     warehouses.all_avail_orders[wrhs.num][order.num] = False
+
 
             # print(f'avail_types of {order.num} has been updated')
         # print(order.check_avail_types(wrhs.prod_amounts))

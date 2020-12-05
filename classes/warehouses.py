@@ -27,6 +27,7 @@ class Warehouse(object):
     def remove_product(self, prod_type, prod_qnty):
         self.prod_amounts.loc[prod_type, "Amounts"] -= prod_qnty
         
+        
     #
     # def find_nearest_order(self, orders):  # dictionary of orders (class Orders)
     #     # o = np.array([orders[x].position for x in orders], dtype=np.float64)
@@ -81,6 +82,13 @@ class Warehouse(object):
 # print(wrh.check_avail2(0, 4))
 # print(wrh.check_avail2(0, 5))
 # print(wrh.check_avail2(0, 6))
+
+    #only update the true ones
+    def update_availability(self, warehouses, orders):
+        avail_orders = np.flatnonzero(warehouses.all_avail_orders[self.num])
+        warehouses.all_avail_orders[self.num][avail_orders] = np.array([np.all(
+                orders.dict[o].check_avail_types(self.prod_amounts)) for o in avail_orders]) 
+                
 class Warehouses():
     def __init__(self, n_wrhs, orders, wrhsdict):
         self.n_wrhs = n_wrhs
