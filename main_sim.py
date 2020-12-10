@@ -35,58 +35,74 @@ wrhslist = [Warehouse(i, wrhs_info[i][0][0], wrhs_info[i][0][1], wrhs_info[i][1]
 wrhsdict = dict(enumerate(wrhslist))
 warehouses = Warehouses(n_wrhs, orders, wrhsdict)
 
-# assign each drone to a warehouse
-# for k in dronesdict.keys():
-#     dronesdict[k].update_cur_pos(wrhsdict[k].position)
+# assign each drone to warehouse 0
+# for i in dronesdict:
+#     dronesdict[i].update_cur_pos(wrhsdict[0].position)
+    
 for i in dronesdict:
-    dronesdict[i].update_cur_pos(wrhsdict[0].position)
+    dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
 # do one cycle of sim:
 # each drone at each warehouse
+completed = 0
+message = 0
+no_type = 0
+total_message = []
 
-# while t<=max_turns:
-while orders.completed.sum()<100:
+while completed<1251:
     for k in dronesdict:
     # for k in range(2):
         # find nearest order
-        w = k%10
-        # t = time.time()
+        # w = k%10
+
+
         drone = dronesdict[k]
-        nearest_warehouse = drone.find_nearest_wh(wrhsdict)
-        drone.turns += np.ceil(dist(drone.cur_pos, nearest_warehouse.position))
+        nearest_warehouse = drone.find_nearest_wh(warehouses)
+        drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_warehouse.position)))
         drone.update_cur_pos(nearest_warehouse.position)
-        # t1 = time.time()
-        # print(f'nearest_wh: {t1-t}')
-        nearest_order = drone.find_nearest_order(orders, warehouses, nearest_warehouse)
-        types, qnty = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
-        t2 = time.time()
-        # print(f'nearest_order: {t2-t1}')
-        # check availability of each product type order in warehouse
+        # if nearest_warehouse.amounts.sum()==0:
+            
         nearest_warehouse.update_availability(warehouses, orders)
-        t3 = time.time()
-        print(f'assign: {t3-t2}')
-        drone.deliver_order(types, qnty, nearest_order, orders)
-        # t4 = time.time()
-        # print(f'deliver: {t4-t3}')
-        # print(orders.completed.sum())
-        # print(drone.turns)
-        print(orders.completed.sum())
-        # print(nearest_warehouse.prod_amounts.Amounts.sum(), nearest_warehouse.num)
+        nearest_order, all = drone.find_nearest_order(orders, warehouses, nearest_warehouse)
+        if nearest_order == 'All orders are completed':
+            message = 'DONE'
+            break
+        types, qnty, loading_message = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
+        if types.shape[0]>0:
+            # print(nearest_order)
+        # check availability of each product type order in warehouse
+            delivery_message = drone.deliver_order(types, qnty, nearest_order, orders)
+            print(f'drone: {drone.num}, wrhs: {nearest_warehouse.num}, all: {all}, tot_items: {warehouses.tot_amounts}, completed: {orders.completed.sum()}, items moved: {qnty.sum()}')
+            # print(f'qnty: {qnty}, types: {types}, avail_items: {nearest_warehouse.prod_amounts.loc[types]}, items moved: {qnty.sum()}')
+            total_message.append(loading_message + delivery_message)
+            # nearest_warehouse.update_availability(warehouses, orders, all)
+        else: 
+            print('no_type')
+            no_type += 1
+            # if np.random.rand(1)>0.5:
+            drone.update_cur_pos(nearest_order.position)
+            drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_order.position)))
+
+            # nearest_warehouse.update_availability(warehouses, orders)
+            # else:
+            #     w_pos = warehouses.positions
+            #     np.random.shuffle(w_pos)
+            #     drone.update_cur_pos(w_pos[0])
+        completed = orders.completed.sum()
+    if message == 'DONE':
+        print(f'orders: {orders.dict}')
+        print(f'warehouses: {warehouses.dict}')
+        print(f'drones: {drones}')
+        print(f'message: {total_message}')
+        print(f'max number of turns: {np.max(np.array([x.turns for x in drones]))}') 
+        print(f'number of cycles with 0 products delivered: {no_type}')
+        break
+
+    # for i in dronesdict:
+    #     dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
     # avail_types = wrhsdict[k].select_avail_types(nearest_order.prod_types)
-    # print(avail_types)
     # avail_qnty = wrhsdict[k].select_avail_quantities(avail_types, nearest_order.df.loc[avail_types])
-    # print(avail_qnty)
-    # print(wrhsdict[k].prod_amounts.loc[nearest_order.prod_types])
 
     # wrhsdict[k].remove_product(avail_types, avail_qnty)
-
-    # print(wrhsdict[k].prod_amounts.loc[nearest_order.prod_types])
-
-
-
-    # print(wrhsdict[k].prod_amounts[wrhsdict[k].prod_amounts['Amounts']>0])
-
-
-
     #
     # for prod_type in nearest_order.prod_types:
     #
