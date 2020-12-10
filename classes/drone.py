@@ -177,6 +177,7 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
         # avail_types = wrhs.select_avail_types(order.prod_types)
         avail_qnty = self.select_avail_quantities(avail_types, order, wrhs)
         # avail_qnty = wrhs.select_avail_quantities(avail_types, order.df.loc[avail_types, 'Amounts'])
+        # print(avail_types, avail_qnty)
         if np.sum(self.weights[avail_types]*avail_qnty)<=200:
             new_types = avail_types
             new_qnty = avail_qnty
@@ -189,12 +190,23 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
             weights = self.weights[types]
             repeated_matrix = np.column_stack((types, weights))
             rep_mat_sorted = repeated_matrix[repeated_matrix[:,1].argsort()]
-            
-            mask_le200 = rep_mat_sorted[:,1].cumsum() <= 200
-            new_types_repeated = rep_mat_sorted[mask_le200][:,0]
+            # print(rep_mat_sorted, order)
+            x = np.median(weights)
 
+            heaviest = rep_mat_sorted[rep_mat_sorted[:,1]>x]
+            lightest_reverted = rep_mat_sorted[rep_mat_sorted[:,1]<=x][::-1]
+            if len(heaviest)==0:
+                new_sorted_matrix = lightest_reverted
+            else:
+                new_sorted_matrix = np.vstack([heaviest[0], lightest_reverted, heaviest[1:]]) 
+            # print(new_sorted_matrix)
+            mask_le200 = new_sorted_matrix[:,1].cumsum() <= 200
+            new_types_repeated = new_sorted_matrix[mask_le200][:,0]
+            # new_types_repeated = rep_mat_sorted[mask_le200][:,0]
+            # print(new_types_repeated)
             # new_types_repeated = repeated_matrix[repeated_matrix[repeated_matrix[:,1].argsort()][:,1].cumsum()<=200][:,0]
             new_types, new_qnty = np.unique(new_types_repeated, return_counts=True)
+            # print(new_types, new_qnty)
 
             # avail_types_df = order.df.loc[avail_types]
             # new_types = avail_types_df.index[avail_types_df['Weights'].cumsum()<=200].values

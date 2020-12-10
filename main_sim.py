@@ -71,7 +71,13 @@ while completed<1251:
             # print(nearest_order)
         # check availability of each product type order in warehouse
             delivery_message = drone.deliver_order(types, qnty, nearest_order, orders)
-            print(f'drone: {drone.num}, wrhs: {nearest_warehouse.num}, all: {all}, tot_items: {warehouses.tot_amounts}, completed: {orders.completed.sum()}, items moved: {qnty.sum()}')
+            max_turns_drones = np.max(np.array([x.turns for x in drones]))
+            turns_orders_completed = np.array(orders.turn_order_completed)
+            score = np.int(np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100)))
+            print(f'drone: {drone.num}, wrhs: {nearest_warehouse.num}, all: {all},\
+                tot_items: {warehouses.tot_amounts}, completed: {orders.completed.sum()},\
+                     items moved: {qnty.sum()}, score: {score}')
+
             # print(f'qnty: {qnty}, types: {types}, avail_items: {nearest_warehouse.prod_amounts.loc[types]}, items moved: {qnty.sum()}')
             total_message.append(loading_message + delivery_message)
             # nearest_warehouse.update_availability(warehouses, orders, all)
@@ -93,8 +99,12 @@ while completed<1251:
         print(f'warehouses: {warehouses.dict}')
         print(f'drones: {drones}')
         print(f'message: {total_message}')
-        print(f'max number of turns: {np.max(np.array([x.turns for x in drones]))}') 
+        max_turns_drones = np.max(np.array([x.turns for x in drones]))
+        print(f'max number of turns: {max_turns_drones}') 
         print(f'number of cycles with 0 products delivered: {no_type}')
+        turns_orders_completed = np.array(orders.turn_order_completed)
+        score = np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100))
+        print(f'score: {score}')
         break
 
     # for i in dronesdict:

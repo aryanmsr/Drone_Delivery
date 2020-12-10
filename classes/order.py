@@ -52,7 +52,9 @@ class Order(object):
 
     def __repr__(self):
         return '(num: ' + str(self.num) + ', ' + 'n_items: ' + str(
-            self.amount) + ', ' + 'tot_weight: ' + str(self.tot_weight) + ', ' + 'types: ' + str(self.prod_types) + ', ' + 'quantities: ' + str(self.prod_amounts) + ')'
+            self.amount) + ', ' + 'tot_weight: ' + str(
+                self.tot_weight) + ', ' + 'types: ' + str(self.prod_types) + ', ' + 'quantities: ' + str(
+                    self.prod_amounts) + ', ' + 'weights:' + str(self.weights[self.amounts>0]) + ')'
 
 
     # TODO: improve remove method, but watch out because it's used in main_sim
@@ -101,6 +103,7 @@ class Order(object):
             self.completed = True
             self.turn_order_completed = turn
             orders.add_completed(self.num)
+            orders.turn_order_completed[self.num] = self.turn_order_completed
         # return self.prod_amounts["Amounts"].sum == 0
 
     def check_avail_types(self, wrhs):  # prod_types  , prod_qnty
@@ -123,6 +126,7 @@ class Orders():
         self.dict = ordersdict
         completed = [ordersdict[x].completed for x in ordersdict]
         self.completed = np.array(completed)
+        self.turn_order_completed = [ordersdict[x].turn_order_completed for x in ordersdict]
         # self.linked_orders = [ordersdict[x].df
         #  for x in ordersdict]
 
