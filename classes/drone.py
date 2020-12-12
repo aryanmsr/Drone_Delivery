@@ -191,7 +191,7 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
             repeated_matrix = np.column_stack((types, weights))
             rep_mat_sorted = repeated_matrix[repeated_matrix[:,1].argsort()]
             # print(rep_mat_sorted, order)
-            x = np.median(weights)
+            x = np.mean(weights)
 
             heaviest = rep_mat_sorted[rep_mat_sorted[:,1]>x]
             lightest_reverted = rep_mat_sorted[rep_mat_sorted[:,1]<=x][::-1]

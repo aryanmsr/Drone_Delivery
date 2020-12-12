@@ -40,6 +40,8 @@ warehouses = Warehouses(n_wrhs, orders, wrhsdict)
 #     dronesdict[i].update_cur_pos(wrhsdict[0].position)
     
 for i in dronesdict:
+    dronesdict[i].update_cur_pos(wrhsdict[0].position)
+    dronesdict[i].turns += np.int(np.ceil(dist(dronesdict[i].cur_pos, wrhsdict[i%10].position)))
     dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
 # do one cycle of sim:
 # each drone at each warehouse
