@@ -4,19 +4,12 @@ from classes.drone import *
 from classes.warehouses import *
 from classes.utility import *
 from classes.order import *
+
 import time
 # initialize raw data
 raw_data = sort_data("./eda/busy_day.in")
 grid_row, grid_col, n_drones, max_turns, max_payload, n_prod_types, weight_prod_types, n_wrhs, wrhs_info, n_orders, order_info = [
     raw_data[i] for i in range(11)]
-
-# For now: override n_drones with n_whrs, so we have 1 drone per whrs
-# n_drones = n_wrhs
-
-# initialize dfs
-# data = Dataframes()
-# df_orders = data.get_df_orders()
-# df_wrhs = data.get_df_wrhs()
 
 # DRONES
 drones = [Drone(i, weight_prod_types) for i in range(n_drones)]
@@ -35,16 +28,14 @@ wrhslist = [Warehouse(i, wrhs_info[i][0][0], wrhs_info[i][0][1], wrhs_info[i][1]
 wrhsdict = dict(enumerate(wrhslist))
 warehouses = Warehouses(n_wrhs, orders, wrhsdict)
 
-# assign each drone to warehouse 0
-# for i in dronesdict:
-#     dronesdict[i].update_cur_pos(wrhsdict[0].position)
-    
+# Drones must start a wharehouse 0
+# then move 3 drones to each warehouse
 for i in dronesdict:
     dronesdict[i].update_cur_pos(wrhsdict[0].position)
-    dronesdict[i].turns += np.int(np.ceil(dist(dronesdict[i].cur_pos, wrhsdict[i%10].position)))
+    dronesdict[i].turns += np.int(np.ceil(dist(dronesdict[i].cur_pos, wrhsdict[i % 10].position)))
     dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
+
 # do one cycle of sim:
-# each drone at each warehouse
 completed = 0
 message = 0
 no_type = 0
@@ -55,7 +46,6 @@ while completed<1251:
     # for k in range(2):
         # find nearest order
         # w = k%10
-
 
         drone = dronesdict[k]
         nearest_warehouse = drone.find_nearest_wh(warehouses)
@@ -69,6 +59,36 @@ while completed<1251:
             message = 'DONE'
             break
         types, qnty, loading_message = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
+    nearest_warehouse.update_availability(warehouses, orders)
+
+    #####
+    if drone.remainder != 0:
+        leftover_types = nearest_order.typelist[~np.isin(nearest_order.typelist, types)]  # qnty problem
+        print(leftover_types)
+        if ((len(leftover_types > 0)) and (np.any(drone.weights[leftover_types]) <= drone.remainder)):
+            # if np.any(drone.weights[leftover_types])<=drone.remainder:
+            wh_next_pickup, types_in_remainder = drone.find_nearest_wh_with_types(warehouses, leftover_types)
+            wh_next_pickup.update_availability(warehouses, orders)  # ? probably not necessary
+            # print(types_in_remainder)
+            if len(types_in_remainder) > 0:
+                types_in_remainder, qnty_remainder, loading_message_r = drone.assign_pickup(wh_next_pickup,
+                                                                                            types_in_remainder,
+                                                                                            warehouses)
+                drone.turns += np.int(np.ceil(dist(drone.cur_pos, wh_next_pickup.position)))
+
+                # update quantitites and types
+                old_stack = np.column_stack((types, qnty))
+                new_stack = np.column_stack((types_in_remainder, qnty_remainder))
+                tot_stack = np.vstack((old_stack, new_stack))
+                types, qnty = np.unique(tot_stack[:, 0], return_counts=True)
+                # #sorted_stack = tot_stack[tot_stack[:,0].argsort()]
+                # types = tot_stack[:,0]
+                # qnty = tot_stack[:,1]
+                loading_message = loading_message + loading_message_r
+                print(tot_stack)
+
+    #reset remainder done in assing_order
+
         if types.shape[0]>0:
             # print(nearest_order)
         # check availability of each product type order in warehouse
@@ -109,46 +129,3 @@ while completed<1251:
         print(f'score: {score}')
         break
 
-    # for i in dronesdict:
-    #     dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
-    # avail_types = wrhsdict[k].select_avail_types(nearest_order.prod_types)
-    # avail_qnty = wrhsdict[k].select_avail_quantities(avail_types, nearest_order.df.loc[avail_types])
-
-    # wrhsdict[k].remove_product(avail_types, avail_qnty)
-    #
-    # for prod_type in nearest_order.prod_types:
-    #
-    #     # retrieve quantity from order data frame
-    #     prod_qnty = nearest_order.prod_amounts.loc[nearest_order.prod_amounts["Types"] == prod_type, "Amounts"].values[0]
-    #
-    #     # if quantity is available
-    #     if wrhsdict[k].check_avail2(prod_type, prod_qnty) == True:
-    #         # load items on drone
-    #         dronesdict[k].load(prod_type, prod_qnty)
-    #         # remove items from whrs
-    #         wrhsdict[k].remove_product(prod_type, prod_qnty)
-    #     # else:
-    #     # print("ORDER " + nearest_order.num + ": Product Type '" + prod_type + "' is not available in quantity " + prod_qnty + ".")
-    #
-    # # fly to order
-    # dronesdict[k].update_cur_pos(nearest_order.position)
-    # # unload the product items onboard and remove from order list.
-    # for i in range(len(dronesdict[k].prod_types)):
-    #     prod_type = dronesdict[k].prod_types[i]
-    #     prod_qnty = dronesdict[k].prod_amounts[i]
-    #     # unload
-    #     dronesdict[k].unload(prod_type, prod_qnty)
-    #     # remove delivered items from the order
-    #     nearest_order.remove(prod_type, prod_qnty)  # TODO fix error
-    #
-    # nearest_order.check_completed()
-
-# TODO: check that the nearest orders found are not the same for each drone
-# TODO: check for maximum payload mass
-# TODO: deal with unavailable quantities
-
-
-# nearest_wrhs = v.find_nearest_wh(wrhsdict)
-# Drones
-# for warehouse class
-# for order class

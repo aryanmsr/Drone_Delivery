@@ -73,6 +73,7 @@ class Order(object):
         for x in list(np.repeat(prod_type, prod_qnty)):
             t.remove(x)
         self.typelist = np.array(t)
+
         # if self.types.shape[0] == 0:
         #     self.df_repeated = pd.DataFrame({})
         # else: 
@@ -82,8 +83,8 @@ class Order(object):
         # self.prod_amounts = self.df['Amounts'].values
         # self.prod_types = self.df.index.values
         # self.weights = self.df['Weights'].values//self.prod_amounts
-        self.amount -= prod_qnty.sum()
 
+        self.amount -= prod_qnty.sum()
         self.tot_weight = np.sum(self.weights[self.prod_types]*self.amounts[self.prod_types])
         # assert np.all(a==b)
         # self.df_repeated = pd.DataFrame({'Amounts': np.ones(self.types.shape), 'Weights': 

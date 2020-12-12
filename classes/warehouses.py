@@ -30,7 +30,7 @@ class Warehouse(object):
 
     # TODO: improve this method
     # update number of items of the product type that is removed
-    def remove_product(self, prod_type, prod_qnty, warehouses): 
+    def remove_product(self, prod_type, prod_qnty, warehouses):
         self.amounts[prod_type] -= prod_qnty
         # self.prod_amounts.loc[prod_type, "Amounts"] -= prod_qnty
         # assert np.all(self.amounts == self.prod_amounts["Amounts"].values)
@@ -150,10 +150,12 @@ class Warehouses():
         self.avail_products = [wrhsdict[x].avail_products for x in wrhsdict]
         self.not_avail = np.array([(wrhsdict[x].not_avail) for x in wrhsdict])
         # self.all = [wrhsdict[x].all for x in wrhsdict]
+
         self.all_avail_orders = {}
         for w in self.dict.values():
             self.all_avail_orders[w.num] = np.array([np.all(
-                o.check_avail_types(w)) for o in orders.dict.values()]) 
+                o.check_avail_types(w)) for o in orders.dict.values()])
+
         self.any_avail_orders = {}
         for w in self.dict.values():
             self.any_avail_orders[w.num] = np.array([np.any(
@@ -162,4 +164,3 @@ class Warehouses():
     def check_empty(self):
         empty_warehouses = [self.dict[x].amounts.sum() <= 0 for x in self.dict]
         return np.array(empty_warehouses)
-
