@@ -14,7 +14,7 @@ class Order(object):
         # types - [1, 1, 2, 3 4, 4]
         # weight product types - initialized @ beginning of sim
 
-        self.amount = amount
+        self.amount = amount[0]
         self.num = num
         self.position = (x, y)
         self.completed = False

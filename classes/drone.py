@@ -195,27 +195,30 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
             weights = self.weights[types]
             repeated_matrix = np.column_stack((types, weights))
             rep_mat_sorted = repeated_matrix[repeated_matrix[:,1].argsort()]
-            # print(rep_mat_sorted, order)
-            x = np.median(weights)
+            # x = np.median(weights)
 
-            heaviest = rep_mat_sorted[rep_mat_sorted[:,1]>x]
-            lightest_reverted = rep_mat_sorted[rep_mat_sorted[:,1]<=x][::-1]
-            if len(heaviest)==0:
-                new_sorted_matrix = lightest_reverted
-            else:
-                new_sorted_matrix = np.vstack([heaviest[0], lightest_reverted, heaviest[1:]]) 
-            # print(new_sorted_matrix)
+            # heaviest = rep_mat_sorted[rep_mat_sorted[:,1]>x]
+            # lightest_reverted = rep_mat_sorted[rep_mat_sorted[:,1]<=x][::-1]
+            # if len(heaviest)==0:
+            #     new_sorted_matrix = lightest_reverted
+            # else:
+            #     new_sorted_matrix = np.vstack([heaviest[0], lightest_reverted, heaviest[1:]]) 
+            # mask_le200 = new_sorted_matrix[:,1].cumsum() <= 200
+            new_sorted_matrix = rep_mat_sorted[::-1]
             mask_le200 = new_sorted_matrix[:,1].cumsum() <= 200
             new_types_repeated = new_sorted_matrix[mask_le200][:,0]
             # new_types_repeated = rep_mat_sorted[mask_le200][:,0]
-            # print(new_types_repeated)
             # new_types_repeated = repeated_matrix[repeated_matrix[repeated_matrix[:,1].argsort()][:,1].cumsum()<=200][:,0]
             new_types, new_qnty = np.unique(new_types_repeated, return_counts=True)
-            # print(new_types, new_qnty)
-
+            new_weigths_repeated = self.weights[new_types_repeated]
             remainder = 200 - new_weigths_repeated.sum()
-            if remainder >= np.min(self.weights):
-                self.remainder = remainder
+            # if remainder >= np.min(self.weights):
+            self.remainder = remainder
+            ###
+            # self.remainder = 200 - new_weigths_repeated.sum()
+            # leftover_types = order.typelist[~np.isin(order.typelist, types)]
+            # if (leftover_types.shape[0] > 0) and np.any(self.remainder >= self.weights[leftover_types]):
+
 
             # avail_types_df = order.df.loc[avail_types]
             # new_types = avail_types_df.index[avail_types_df['Weights'].cumsum()<=200].values
@@ -257,8 +260,23 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
 
     # method necessary for reminder
     def find_nearest_wh_with_types(self, warehouses, leftover_types):
-        all_types_avail_in_whs = np.array([i.nonzero()[0] for i in warehouses.avail_products])
-        # i.flatnonzero
+        leftover_acceptable_types = leftover_types[self.weights[leftover_types]<=self.remainder]
+        avail_acceptable_leftover = np.array([np.any(x[leftover_acceptable_types]) for x in warehouses.avail_products])
+        wh = np.array(warehouses.positions, dtype=np.float64)
+        wh[~avail_acceptable_leftover] = np.inf
+        d = dist(self.cur_pos, wh)
+        if d.min() == np.inf:
+            return 'no_pickup', []
+        index_argmin = np.argmin(d)
+        wh_next_pickup = warehouses.dict[index_argmin]
+        types_in_remainder = leftover_types[wh_next_pickup.avail_products[leftover_types]]
+        types_sorted = types_in_remainder[self.weights[types_in_remainder].argsort()]
+        types_chosen = types_sorted[self.weights[types_sorted].cumsum()<=self.remainder]
+        return wh_next_pickup, types_chosen  
+
+    def find_nearest_wh_with_types1(self, warehouses, leftover_types):
+
+        all_types_avail_in_whs = np.array([np.flatnonzero(i) for i in warehouses.avail_products])
 
         # wh_num_types_avail = []  #give priority to the ones with most product types that fit in the remainder
         wh_with_leftover_types = []  # 1, 2, 3
@@ -293,9 +311,9 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
         mask_chosen = self.weights[
                           wh_checked_types[wh_with_leftover_types.index(wh_next_pickup.num)]].cumsum() <= self.remainder
         types_in_remainder = wh_checked_types[wh_with_leftover_types.index(wh_next_pickup.num)][mask_chosen]
-        print(f'Cosa Abbiamo : {types_in_remainder}')
+        # print(f'Cosa Abbiamo : {types_in_remainder}')
 
-        return wh_next_pickup, types_in_remainder  # .astype(int)
+        return wh_next_pickup, types_in_remainder  
 
     def assign_pickup(self, wh_next_pickup, types_in_remainder, warehouses):
         # Quantity is just 1
@@ -305,7 +323,7 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
 
         assert self.compute_weight().sum() <= 200
 
-        print(types_in_remainder)
-        print(wh_next_pickup)
+        # print(types_in_remainder)
+        # print(wh_next_pickup)
         self.remainder -= self.weights[types_in_remainder].sum()
         return types_in_remainder, qnty_remainder, loading_message

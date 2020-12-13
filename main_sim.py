@@ -39,19 +39,16 @@ for i in dronesdict:
 completed = 0
 message = 0
 no_type = 0
+remainder = 0
 total_message = []
 
 while completed<1251:
     for k in dronesdict:
-    # for k in range(2):
-        # find nearest order
-        # w = k%10
 
         drone = dronesdict[k]
         nearest_warehouse = drone.find_nearest_wh(warehouses)
         drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_warehouse.position)))
         drone.update_cur_pos(nearest_warehouse.position)
-        # if nearest_warehouse.amounts.sum()==0:
             
         nearest_warehouse.update_availability(warehouses, orders)
         nearest_order, all = drone.find_nearest_order(orders, warehouses, nearest_warehouse)
@@ -59,46 +56,49 @@ while completed<1251:
             message = 'DONE'
             break
         types, qnty, loading_message = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
-    nearest_warehouse.update_availability(warehouses, orders)
-
+        nearest_warehouse.update_availability(warehouses, orders)
+        print(types, drone.weights[types])
     #####
-    if drone.remainder != 0:
-        leftover_types = nearest_order.typelist[~np.isin(nearest_order.typelist, types)]  # qnty problem
-        print(leftover_types)
-        if ((len(leftover_types > 0)) and (np.any(drone.weights[leftover_types]) <= drone.remainder)):
-            # if np.any(drone.weights[leftover_types])<=drone.remainder:
-            wh_next_pickup, types_in_remainder = drone.find_nearest_wh_with_types(warehouses, leftover_types)
-            wh_next_pickup.update_availability(warehouses, orders)  # ? probably not necessary
-            # print(types_in_remainder)
-            if len(types_in_remainder) > 0:
-                types_in_remainder, qnty_remainder, loading_message_r = drone.assign_pickup(wh_next_pickup,
-                                                                                            types_in_remainder,
-                                                                                            warehouses)
-                drone.turns += np.int(np.ceil(dist(drone.cur_pos, wh_next_pickup.position)))
+        if drone.remainder != 0:
+            leftover_types = nearest_order.typelist[~np.isin(nearest_order.typelist, types)]  # qnty problem
+            # print(leftover_types)
+            # print(drone.weights[leftover_types]) <= drone.remainder)
+            if ((len(leftover_types > 0)) and (np.any(drone.weights[leftover_types] <= drone.remainder))):
+                # if np.any(drone.weights[leftover_types])<=drone.remainder:
+                print(nearest_order)
+                wh_next_pickup, types_in_remainder = drone.find_nearest_wh_with_types(warehouses, leftover_types)
+                wh_next_pickup.update_availability(warehouses, orders)  # ? probably not necessary
+                # print(types_in_remainder)
+                if len(types_in_remainder) > 0:
+                    types_in_remainder, qnty_remainder, loading_message_r = drone.assign_pickup(wh_next_pickup,
+                                                                                                types_in_remainder,
+                                                                                                warehouses)
+                    drone.turns += np.int(np.ceil(dist(drone.cur_pos, wh_next_pickup.position)))
 
-                # update quantitites and types
-                old_stack = np.column_stack((types, qnty))
-                new_stack = np.column_stack((types_in_remainder, qnty_remainder))
-                tot_stack = np.vstack((old_stack, new_stack))
-                types, qnty = np.unique(tot_stack[:, 0], return_counts=True)
-                # #sorted_stack = tot_stack[tot_stack[:,0].argsort()]
-                # types = tot_stack[:,0]
-                # qnty = tot_stack[:,1]
-                loading_message = loading_message + loading_message_r
-                print(tot_stack)
-
+                    # update quantitites and types
+                    old_stack = np.column_stack((types, qnty))
+                    new_stack = np.column_stack((types_in_remainder, qnty_remainder))
+                    tot_stack = np.vstack((old_stack, new_stack))
+                    types, qnty = np.unique(tot_stack[:, 0], return_counts=True)
+                    # #sorted_stack = tot_stack[tot_stack[:,0].argsort()]
+                    # types = tot_stack[:,0]
+                    # qnty = tot_stack[:,1]
+                    loading_message = loading_message + loading_message_r
+                    remainder += 1
+                    # print(tot_stack)
     #reset remainder done in assing_order
-
+        
         if types.shape[0]>0:
             # print(nearest_order)
         # check availability of each product type order in warehouse
             delivery_message = drone.deliver_order(types, qnty, nearest_order, orders)
-            max_turns_drones = np.max(np.array([x.turns for x in drones]))
-            turns_orders_completed = np.array(orders.turn_order_completed)
-            score = np.int(np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100)))
-            print(f'drone: {drone.num}, wrhs: {nearest_warehouse.num}, all: {all},\
-                tot_items: {warehouses.tot_amounts}, completed: {orders.completed.sum()},\
-                     items moved: {qnty.sum()}, score: {score}')
+
+            # max_turns_drones = np.max(np.array([x.turns for x in drones]))
+            # turns_orders_completed = np.array(orders.turn_order_completed)
+            # score = np.int(np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100)))
+            print(f'drone: {drone.num}', f'wrhs: {nearest_warehouse.num}',f'all: {all}',
+            f'tot_items: {warehouses.tot_amounts}', f'completed: {orders.completed.sum()}',
+                     f'items moved: {qnty.sum()}', f'remainder: {remainder}', sep = ',')
 
             # print(f'qnty: {qnty}, types: {types}, avail_items: {nearest_warehouse.prod_amounts.loc[types]}, items moved: {qnty.sum()}')
             total_message.append(loading_message + delivery_message)
