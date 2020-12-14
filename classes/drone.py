@@ -5,7 +5,7 @@ from classes.order import *
 from classes.warehouses import *
 import pandas as pd
 
-class Drone(object):  # inherit #product #warehouse #order (#utility)
+class Drone():  # inherit #product #warehouse #order (#utility)
 
     def __init__(self, num, weight_prod_types):
         self.num = num
@@ -181,13 +181,14 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
         # print(avail_types, avail_qnty)
 
         # If all order fits in the drone
-        if np.sum(self.weights[avail_types]*avail_qnty)<=200:
+        if np.sum(self.weights[avail_types]*avail_qnty)<=200: # the drone can leave the warehouse with spare space
             new_types = avail_types
             new_qnty = avail_qnty
             # wrhs.remove_product(new_types, new_qnty, warehouses)
             # self.load(new_types, new_qnty, wrhs)
 
         #if order is heavier than drone max payload mass
+        # why would it look for another nearest warehouse? 
         else:
             # types = np.repeat(avail_types, avail_qnty)
             # weights = 
