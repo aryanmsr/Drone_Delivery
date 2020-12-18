@@ -25,8 +25,8 @@ class Warehouse(object):
         return '(num: ' + str(self.num) + ', ' + 'position: ' + str(self.position) + ', ' + 'tot_amount: ' + str(self.tot_amounts) + ')'
 
     # Useless?
-    def add_product(self, prod_type, prod_qnty):
-        self.prod_amounts.append(prod_qnty)
+    # def add_product(self, prod_type, prod_qnty):
+    #     self.prod_amounts.append(prod_qnty)
 
     # TODO: improve this method
     # update number of items of the product type that is removed

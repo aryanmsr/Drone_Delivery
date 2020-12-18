@@ -41,10 +41,10 @@ message = 0
 no_type = 0
 remainder = 0
 total_message = []
+n_lines = 0
 
 while completed<1251:
     for k in dronesdict:
-
         drone = dronesdict[k]
         nearest_warehouse = drone.find_nearest_wh(warehouses)
         drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_warehouse.position)))
@@ -57,7 +57,7 @@ while completed<1251:
             break
         types, qnty, loading_message = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
         nearest_warehouse.update_availability(warehouses, orders)
-        print(types, drone.weights[types])
+        # print(types, drone.weights[types])
     #####
         if drone.remainder != 0:
             leftover_types = nearest_order.typelist[~np.isin(nearest_order.typelist, types)]  # qnty problem
@@ -101,14 +101,15 @@ while completed<1251:
                      f'items moved: {qnty.sum()}', f'remainder: {remainder}', sep = ',')
 
             # print(f'qnty: {qnty}, types: {types}, avail_items: {nearest_warehouse.prod_amounts.loc[types]}, items moved: {qnty.sum()}')
+            n_lines += len(total_message)
             total_message.append(loading_message + delivery_message)
             # nearest_warehouse.update_availability(warehouses, orders, all)
         else: 
             print('no_type')
-            no_type += 1
-            # if np.random.rand(1)>0.5:
-            drone.update_cur_pos(nearest_order.position)
-            drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_order.position)))
+            # no_type += 1
+            # # if np.random.rand(1)>0.5:
+            # drone.update_cur_pos(nearest_order.position)
+            # drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_order.position)))
 
             # nearest_warehouse.update_availability(warehouses, orders)
             # else:
@@ -120,6 +121,9 @@ while completed<1251:
         print(f'orders: {orders.dict}')
         print(f'warehouses: {warehouses.dict}')
         print(f'drones: {drones}')
+        final_message = [n_lines]
+        for x in total_message:
+            final_message.append(x)
         print(f'message: {total_message}')
         max_turns_drones = np.max(np.array([x.turns for x in drones]))
         print(f'max number of turns: {max_turns_drones}') 

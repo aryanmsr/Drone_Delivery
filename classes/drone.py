@@ -249,6 +249,7 @@ class Drone(object):  # inherit #product #warehouse #order (#utility)
     def deliver_order(self, types, qnty, order, orders):
         self.turns += np.int(np.ceil(dist(self.cur_pos, order.position)))
         self.update_cur_pos(order.position)
+        assert order.amount >= qnty.sum()
         delivery_message = self.deliver(types, qnty, order, orders)
         order.remove_prod(types, qnty)
         assert order.amount >= 0
