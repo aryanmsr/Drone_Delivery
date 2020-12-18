@@ -5,7 +5,8 @@ from classes.order import *
 from classes.warehouses import *
 import pandas as pd
 import time
-class Warehouse(object):
+
+class Warehouse():
 
     def __init__(self, num, x, y, amounts, weight_product_types):
         # amounts - list of every product type amount, some are zero if that product type is not available
@@ -40,7 +41,7 @@ class Warehouse(object):
         warehouses.avail_products[self.num] =  self.avail_products
         assert np.all(self.amounts>=0)
     
-    def update_not_avail(self, warehouses):
+    def update_not_avail(self, warehouses): # what does this do?
         self.not_avail = True
         warehouses.not_avail[self.num] = True
 
