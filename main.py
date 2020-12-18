@@ -102,6 +102,6 @@ if message == 'DONE':
     score = np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100))
     print(f'score: {score}')
     
-pd_message = pd.concat((pd.Series(n_lines), pd.Series(final_message)), ignore_index = True)
-pd_message.to_csv('submission.csv', index = False, header = False)
+# pd_message = pd.concat((pd.Series(n_lines), pd.Series(final_message)), ignore_index = True)
+# pd_message.to_csv('submission.csv', index = False, header = False)
 
