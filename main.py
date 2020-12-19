@@ -68,10 +68,11 @@ while completed<1251:
         # total_message.append(loading_message + delivery_message)
         if len(nono)>0:
             types_nono, qnty_nono, order_nono = nono
-            print(nearest_order, order_nono)
+            # print(nearest_order, order_nono)
             delivery_message_nono = drone.deliver_order(types_nono, qnty_nono, order_nono, orders)
             delivery_message += delivery_message_nono
         total_message.append(loading_message + delivery_message)
+        assert len(loading_message) == len(delivery_message)
     else: 
         print('no_type')
         no_type += 1
