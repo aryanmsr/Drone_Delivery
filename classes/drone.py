@@ -246,17 +246,10 @@ class Drone():  # inherit #product #warehouse #order (#utility)
             if np.all((not_completed.shape[0] , check_types.shape[0] , check_weights.shape[0] > 0,0,0)):
                 mask = not_completed & check_types & check_weights
                 orders_near_order[mask] = False
-            # else:
-            #     orders_near_order = np.array([])
+            else:
+                orders_near_order = np.array([])
 
-            # print(orders_near_order)
-            # if orders_near_order.shape[0]>0:
-            #     orders_near_order = orders_near_order[~np.array([o.completed for o in orders_near_order])]
-            # if orders_near_order.shape[0]>0:
-            #     orders_near_order = orders_near_order[np.array([np.any((self.weights[o.prod_types]<=remainder)) for o in orders_near_order])] 
-            # if orders_near_order.shape[0]>0:
-            #     orders_near_order = orders_near_order[np.array([np.any(o.check_avail_types(wrhs)) for o in orders_near_order])] 
-            
+
             if orders_near_order.shape[0]>0:
                 
                 orders_near_order_pos = np.array([o.position for o in orders_near_order])
