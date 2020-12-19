@@ -257,9 +257,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
 
                 # nono = orders_near_order[np.argmin(d)] #nearest order to the nearest order
                     d = [o.amount for o in orders_near_order]
-                    # print(d)
                     nono = orders_near_order[np.argmax(d)] #nearest order to the nearest order 
-                    # print(nono)
                     avail_types_nono = nono.prod_types[wrhs.avail_products[nono.prod_types]]
                     avail_qnty_nono = self.select_avail_quantities(avail_types_nono, nono, wrhs)
                     types_nono = np.repeat(avail_types_nono, avail_qnty_nono)
@@ -269,7 +267,6 @@ class Drone():  # inherit #product #warehouse #order (#utility)
                     mask_le_rem = weights_nono.cumsum() <= remainder
                     new_types_repeated_nono = sorted_types_nono[mask_le_rem]
                     new_types_nono, new_qnty_nono = np.unique(new_types_repeated_nono, return_counts=True)
-                    print(avail_types_nono, avail_qnty_nono, types_nono, new_types_nono, new_qnty_nono)
                     wrhs.remove_product(new_types_nono, new_qnty_nono, warehouses)
                     loading_message_nono = self.load(new_types_nono, new_qnty_nono, wrhs)
                     result_nono = new_types_nono, new_qnty_nono, nono

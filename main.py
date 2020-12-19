@@ -40,11 +40,13 @@ message = 0
 no_type = 0
 remainder = 0
 total_message = []
+drone_turns = np.array([x.turns for x in dronesdict.values()])
 
 while completed<1251:
     loading_message_r = []
-    drone_turns = np.array([x.turns for x in dronesdict.values()])
+    # drone_turns = np.array([x.turns for x in dronesdict.values()])
     drone = dronesdict[np.argmin(drone_turns)]
+    turn_begin = drone.turns
     nearest_warehouse = drone.find_nearest_wh(warehouses)
     drone.update_cur_pos(nearest_warehouse.position)
         
@@ -61,7 +63,7 @@ while completed<1251:
         # print(f'drone: {drone.num}', f'wrhs: {nearest_warehouse.num}',f'all: {all}',
         # f'tot_items: {warehouses.tot_amounts}', f'completed: {orders.completed.sum()}',
         #             f'items moved: {qnty.sum()}', f'remainder: {remainder}', sep = ',')
-        print(f'completed : {orders.completed.sum()}')
+        print(f'completed : {orders.completed.sum()}', f'turns: {drone_turns}')
         # if loading_message_r !=[]:
         #     print(f'load: {loading_message}', f'load_r: {loading_message_r}', 
         #     f'delivery: {delivery_message}')
@@ -76,6 +78,7 @@ while completed<1251:
     else: 
         print('no_type')
         no_type += 1
+    drone_turns[drone.num] = drone.turns
     completed = orders.completed.sum()
 if message == 'DONE':
 #     print(f'orders: {orders.dict}')
@@ -86,11 +89,12 @@ if message == 'DONE':
         final_message.extend(x)
     n_lines = len(final_message)
 #     print(f'message: {total_message}')
-    max_turns_drones = np.max(np.array([x.turns for x in drones]))
+    print(f'drone turns: {drone_turns}')
+    max_turns_drones = np.max(drone_turns)
     print(f'max number of turns: {max_turns_drones}') 
     print(f'number of cycles with 0 products delivered: {no_type}')
     turns_orders_completed = np.array(orders.turn_order_completed)
-    score = np.sum(np.ceil((max_turns_drones-turns_orders_completed)/max_turns_drones*100))
+    score = np.sum(np.ceil(((max_turns_drones-turns_orders_completed)/max_turns_drones)*100))
     print(f'score: {score}')
     
 # pd_message = pd.concat((pd.Series(n_lines), pd.Series(final_message)), ignore_index = True)

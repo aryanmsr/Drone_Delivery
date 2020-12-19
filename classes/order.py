@@ -126,7 +126,7 @@ class Orders():
         self.num = np.array([o.num for o in ordersdict.values()])
         self.array = np.array([o for o in ordersdict.values()])
         pos = np.array(self.positions)
-        neighbors = (np.sum((pos.reshape((1,1250,2)) - pos.reshape((1250, 1, 2)))**2, 2)<20)
+        neighbors = (np.sum((pos.reshape((1,1250,2)) - pos.reshape((1250, 1, 2)))**2, 2)<10)
         ni = np.diag_indices(1250)
         neighbors[ni] = False
         # neighbors = [self.array[(np.sum((pos - ordersdict[i].position)**2, 1)<20)] for i in range(1250)]
