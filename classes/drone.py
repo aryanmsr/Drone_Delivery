@@ -107,6 +107,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         return self.cur_pos
 
     def update_cur_pos(self, new_pos):
+        self.turns += np.int(np.ceil(dist(self.cur_pos, new_pos)))
         self.cur_pos = new_pos  # define in utility class
 
     # account for distance in the count of turns for delivery
@@ -171,19 +172,19 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         # print((order_pos<np.inf).sum())
         return nearest_order, 1 #53990
 
-    def assign_order(self, order, wrhs, warehouses):
+    def assign_order(self, order, wrhs, warehouses, orders):
         self.orders.append(order)
         # order.assigned += 1        
         avail_types = self.select_avail_types(wrhs, order)
         # avail_types = wrhs.select_avail_types(order.prod_types)
         avail_qnty = self.select_avail_quantities(avail_types, order, wrhs)
         # avail_qnty = wrhs.select_avail_quantities(avail_types, order.df.loc[avail_types, 'Amounts'])
-        # print(avail_types, avail_qnty)
 
         # If all order fits in the drone
         if np.sum(self.weights[avail_types]*avail_qnty)<=200: # the drone can leave the warehouse with spare space
             new_types = avail_types
             new_qnty = avail_qnty
+            payload = self.weights[new_types].sum()
             # wrhs.remove_product(new_types, new_qnty, warehouses)
             # self.load(new_types, new_qnty, wrhs)
 
@@ -191,11 +192,12 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         # why would it look for another nearest warehouse? 
         else:
             # types = np.repeat(avail_types, avail_qnty)
-            # weights = 
             types = np.repeat(avail_types, avail_qnty)
             weights = self.weights[types]
-            repeated_matrix = np.column_stack((types, weights))
-            rep_mat_sorted = repeated_matrix[repeated_matrix[:,1].argsort()]
+            print(weights)
+            # repeated_matrix = np.column_stack((types, weights))
+            # rep_mat_sorted = repeated_matrix[repeated_matrix[:,1].argsort()]
+            types_sorted = types[weights.argsort()][::-1]
             # x = np.median(weights)
 
             # heaviest = rep_mat_sorted[rep_mat_sorted[:,1]>x]
@@ -205,39 +207,76 @@ class Drone():  # inherit #product #warehouse #order (#utility)
             # else:
             #     new_sorted_matrix = np.vstack([heaviest[0], lightest_reverted, heaviest[1:]]) 
             # mask_le200 = new_sorted_matrix[:,1].cumsum() <= 200
-            new_sorted_matrix = rep_mat_sorted[::-1]
-            mask_le200 = new_sorted_matrix[:,1].cumsum() <= 200
-            new_types_repeated = new_sorted_matrix[mask_le200][:,0]
+            # new_sorted_matrix = rep_mat_sorted
+            # new_sorted_matrix = rep_mat_sorted[::-1]
+            # mask_le_200 = new_sorted_matrix[:,1].cumsum() <= 200
+            weights.sort()
+            mask_le_200 = weights.cumsum() <= 200
+            # mask_le_200 = self.weights[types_sorted].cumsum() <= 200
+            new_types_repeated = types_sorted[mask_le_200]
+                # types_nono = np.repeat(avail_types_nono, avail_qnty_nono)
+                # weights_nono = self.weights[types_nono]
+                # sorted_types_nono = types_nono[weights_nono.argsort()]
+                # weights_nono.sort()
+                # mask_le_rem = weights_nono.cumsum() <= remainder
+
             # new_types_repeated = rep_mat_sorted[mask_le200][:,0]
             # new_types_repeated = repeated_matrix[repeated_matrix[repeated_matrix[:,1].argsort()][:,1].cumsum()<=200][:,0]
             new_types, new_qnty = np.unique(new_types_repeated, return_counts=True)
-            new_weigths_repeated = self.weights[new_types_repeated]
-            remainder = 200 - new_weigths_repeated.sum()
-            # if remainder >= np.min(self.weights):
-            self.remainder = remainder
-            ###
-            # self.remainder = 200 - new_weigths_repeated.sum()
-            # leftover_types = order.typelist[~np.isin(order.typelist, types)]
-            # if (leftover_types.shape[0] > 0) and np.any(self.remainder >= self.weights[leftover_types]):
+            # new_weigths_repeated = self.weights[new_types_repeated]
+            payload = self.weights[new_types_repeated].sum()
 
-
-            # avail_types_df = order.df.loc[avail_types]
-            # new_types = avail_types_df.index[avail_types_df['Weights'].cumsum()<=200].values
-            # new_qnty = avail_types_df.loc[new_types, 'Amounts'].values
-
-            # if new_types.shape[0] == 0:
-            #     types = np.repeat(avail_types, avail_qnty)
-            #     weights = self.weights[types]
-            #     repeated_matrix = np.column_stack((types, weights))
-            #     new_types_repeated = repeated_matrix[repeated_matrix[repeated_matrix[:,1].argsort()][:,1].cumsum()<=200][:,0]
-            #     new_types, new_qnty = np.unique(new_types_repeated, return_counts=True)
-
-                # avail_types_df_repeated = order.create_df_repeated(avail_types, avail_qnty)
-                # types_repeated = avail_types_df_repeated.index[avail_types_df_repeated['Weights'].cumsum()<=200].values
-        
         wrhs.remove_product(new_types, new_qnty, warehouses)
         loading_message = self.load(new_types, new_qnty, wrhs)
-        return new_types, new_qnty, loading_message
+
+        remainder = 200 - payload
+        self.remainder = remainder
+        loading_message_nono = []
+        result_nono = []
+        print(remainder)
+        if remainder>0:
+            order_neighbors = orders.neighbors[order.num]
+            orders_near_order = orders.array[order_neighbors]
+            not_completed = ~orders.completed[order_neighbors]
+            # check_types = np.array([np.any(o.check_avail_types(wrhs)) for o in orders_near_order])
+            check_types = warehouses.any_avail_orders[wrhs.num][order_neighbors]
+            # check_weights = np.array([np.any((self.weights[o.prod_types]<=remainder)) for o in orders_near_order])
+            check_weights = np.array([np.any((self.weights[o.prod_types]<=remainder)) for o in orders.array[order_neighbors]])
+            # print(not_completed.shape , check_types.shape , check_weights.shape)
+            if np.all((not_completed.shape[0] , check_types.shape[0] , check_weights.shape[0] > 0,0,0)):
+                mask = not_completed & check_types & check_weights
+                orders_near_order[mask] = False
+            # else:
+            #     orders_near_order = np.array([])
+
+            # print(orders_near_order)
+            # if orders_near_order.shape[0]>0:
+            #     orders_near_order = orders_near_order[~np.array([o.completed for o in orders_near_order])]
+            # if orders_near_order.shape[0]>0:
+            #     orders_near_order = orders_near_order[np.array([np.any((self.weights[o.prod_types]<=remainder)) for o in orders_near_order])] 
+            # if orders_near_order.shape[0]>0:
+            #     orders_near_order = orders_near_order[np.array([np.any(o.check_avail_types(wrhs)) for o in orders_near_order])] 
+            
+            if orders_near_order.shape[0]>0:
+                
+                orders_near_order_pos = np.array([o.position for o in orders_near_order])
+                d = dist(orders_near_order_pos, order.position)
+                nono = orders_near_order[np.argmin(d)] #nearest order to the nearest order
+                avail_types_nono = nono.prod_types[nono.check_avail_types(wrhs)]
+                avail_qnty_nono = nono.amounts[avail_types_nono]
+                types_nono = np.repeat(avail_types_nono, avail_qnty_nono)
+                weights_nono = self.weights[types_nono]
+                sorted_types_nono = types_nono[weights_nono.argsort()]
+                weights_nono.sort()
+                mask_le_rem = weights_nono.cumsum() <= remainder
+                new_types_repeated_nono = sorted_types_nono[mask_le_rem]
+                new_types_nono, new_qnty_nono = np.unique(new_types_repeated_nono, return_counts=True)
+                wrhs.remove_product(new_types_nono, new_qnty_nono, warehouses)
+                loading_message_nono = self.load(new_types_nono, new_qnty_nono, wrhs)
+                result_nono = new_types_nono, new_qnty_nono, nono
+                print(avail_types_nono, avail_qnty_nono, types_nono, result_nono)
+
+        return new_types, new_qnty, loading_message + loading_message_nono, result_nono
 
         # if not np.all(order.check_avail_types(wrhs.prod_amounts)):
         #     warehouses.all_avail_orders[wrhs.num][order.num] = False
@@ -248,7 +287,7 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         # return new_types, new_qnty
 
     def deliver_order(self, types, qnty, order, orders):
-        self.turns += np.int(np.ceil(dist(self.cur_pos, order.position)))
+        # self.turns += np.int(np.ceil(dist(self.cur_pos, order.position)))
         self.update_cur_pos(order.position)
         assert order.amount >= qnty.sum()
         delivery_message = self.deliver(types, qnty, order, orders)
@@ -262,11 +301,15 @@ class Drone():  # inherit #product #warehouse #order (#utility)
 
     # method necessary for reminder
     def find_nearest_wh_with_types(self, warehouses, leftover_types):
+        # print(leftover_types)
         leftover_acceptable_types = leftover_types[self.weights[leftover_types]<=self.remainder]
+        # print(leftover_acceptable_types)
         avail_acceptable_leftover = np.array([np.any(x[leftover_acceptable_types]) for x in warehouses.avail_products])
+        # print(avail_acceptable_leftover)
         wh = np.array(warehouses.positions, dtype=np.float64)
         wh[~avail_acceptable_leftover] = np.inf
         d = dist(self.cur_pos, wh)
+        # print(d)
         if d.min() == np.inf:
             return 'no_pickup', []
         index_argmin = np.argmin(d)
@@ -322,10 +365,6 @@ class Drone():  # inherit #product #warehouse #order (#utility)
         qnty_remainder = np.ones(len(types_in_remainder), dtype=np.int64)
         wh_next_pickup.remove_product(types_in_remainder, qnty_remainder, warehouses)
         loading_message = self.load(types_in_remainder, qnty_remainder, wh_next_pickup)
-
         assert self.compute_weight().sum() <= 200
-
-        # print(types_in_remainder)
-        # print(wh_next_pickup)
         self.remainder -= self.weights[types_in_remainder].sum()
         return types_in_remainder, qnty_remainder, loading_message

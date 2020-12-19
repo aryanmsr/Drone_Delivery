@@ -123,13 +123,21 @@ class Orders():
     def __init__(self, n_orders, ordersdict):
         positions = [ordersdict[x].position for x in ordersdict]
         self.positions = np.array(positions)
+        self.num = np.array([o.num for o in ordersdict.values()])
+        self.array = np.array([o for o in ordersdict.values()])
+        pos = np.array(self.positions)
+        neighbors = (np.sum((pos.reshape((1,1250,2)) - pos.reshape((1250, 1, 2)))**2, 2)<20)
+        ni = np.diag_indices(1250)
+        neighbors[ni] = False
+        # neighbors = [self.array[(np.sum((pos - ordersdict[i].position)**2, 1)<20)] for i in range(1250)]
+        # [self.array[n] for n in neighbors]
+        self.neighbors = neighbors
         self.n_orders = n_orders
         self.dict = ordersdict
         completed = [ordersdict[x].completed for x in ordersdict]
         self.completed = np.array(completed)
         self.turn_order_completed = [ordersdict[x].turn_order_completed for x in ordersdict]
-        # self.linked_orders = [ordersdict[x].df
-        #  for x in ordersdict]
+# np.sum((p.reshape((1,5,2))- p.reshape((5,1,2)))**2, 2)
 
     def __repr__(self):
         return f'n_orders: {self.n_orders}, completed: {self.completed.sum()}'

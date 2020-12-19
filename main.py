@@ -31,7 +31,7 @@ warehouses = Warehouses(n_wrhs, orders, wrhsdict)
 # then move 3 drones to each warehouse
 for i in dronesdict:
     dronesdict[i].update_cur_pos(wrhsdict[0].position)
-    dronesdict[i].turns += np.int(np.ceil(dist(dronesdict[i].cur_pos, wrhsdict[i % 10].position)))
+    # dronesdict[i].turns += np.int(np.ceil(dist(dronesdict[i].cur_pos, wrhsdict[i % 10].position)))
     dronesdict[i].update_cur_pos(wrhsdict[i%10].position)
 
 # do one cycle of sim:
@@ -40,13 +40,12 @@ message = 0
 no_type = 0
 remainder = 0
 total_message = []
-n_lines = 0
 
 while completed<1251:
+    loading_message_r = []
     drone_turns = np.array([x.turns for x in dronesdict.values()])
     drone = dronesdict[np.argmin(drone_turns)]
     nearest_warehouse = drone.find_nearest_wh(warehouses)
-    drone.turns += np.int(np.ceil(dist(drone.cur_pos, nearest_warehouse.position)))
     drone.update_cur_pos(nearest_warehouse.position)
         
     nearest_warehouse.update_availability(warehouses, orders)
@@ -54,33 +53,24 @@ while completed<1251:
     if nearest_order == 'All orders are completed':
         message = 'DONE'
         break
-    types, qnty, loading_message = drone.assign_order(nearest_order, nearest_warehouse, warehouses)
+    types, qnty, loading_message, nono = drone.assign_order(nearest_order, nearest_warehouse, warehouses, orders)
     nearest_warehouse.update_availability(warehouses, orders)
-#####
-#     if drone.remainder != 0:
-#         leftover_types = nearest_order.typelist[~np.isin(nearest_order.typelist, types)]  # qnty problem
-#         if ((len(leftover_types > 0)) and (np.any(drone.weights[leftover_types] <= drone.remainder))):
-#             wh_next_pickup, types_in_remainder = drone.find_nearest_wh_with_types(warehouses, leftover_types)
-#             wh_next_pickup.update_availability(warehouses, orders)  # ? probably not necessary
-#             if len(types_in_remainder) > 0:
-#                 types_in_remainder, qnty_remainder, loading_message_r = drone.assign_pickup(wh_next_pickup,
-#                                                                                             types_in_remainder,
-#                                                                                             warehouses)
-#                 drone.turns += np.int(np.ceil(dist(drone.cur_pos, wh_next_pickup.position)))
-#                 old_stack = np.column_stack((types, qnty))
-#                 new_stack = np.column_stack((types_in_remainder, qnty_remainder))
-#                 tot_stack = np.vstack((old_stack, new_stack))
-#                 types, qnty = np.unique(tot_stack[:, 0], return_counts=True)
-#                 loading_message = loading_message + loading_message_r
-#                 remainder += 1
-#reset remainder done in assing_order
     if types.shape[0]>0:
     # check availability of each product type order in warehouse
         delivery_message = drone.deliver_order(types, qnty, nearest_order, orders)
-#         print(f'drone: {drone.num}', f'wrhs: {nearest_warehouse.num}',f'all: {all}',
-#         f'tot_items: {warehouses.tot_amounts}', f'completed: {orders.completed.sum()}',
-#                     f'items moved: {qnty.sum()}', f'remainder: {remainder}', sep = ',')
+        # print(f'drone: {drone.num}', f'wrhs: {nearest_warehouse.num}',f'all: {all}',
+        # f'tot_items: {warehouses.tot_amounts}', f'completed: {orders.completed.sum()}',
+        #             f'items moved: {qnty.sum()}', f'remainder: {remainder}', sep = ',')
         print(f'completed : {orders.completed.sum()}')
+        # if loading_message_r !=[]:
+        #     print(f'load: {loading_message}', f'load_r: {loading_message_r}', 
+        #     f'delivery: {delivery_message}')
+        # total_message.append(loading_message + delivery_message)
+        if len(nono)>0:
+            types_nono, qnty_nono, order_nono = nono
+            print(nearest_order, order_nono)
+            delivery_message_nono = drone.deliver_order(types_nono, qnty_nono, order_nono, orders)
+            delivery_message += delivery_message_nono
         total_message.append(loading_message + delivery_message)
     else: 
         print('no_type')
