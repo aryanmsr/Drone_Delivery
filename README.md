@@ -40,5 +40,5 @@ The main idea of our algorithm is the following:
 
 ## Some Visuals
 <div align="left">
-  <img alt="Cover" src="https://github.com/aryanmsr/Mobile_Game_Analysis/blob/master/mobile_game_cover.jpg" width=1000 />
+  <img alt="Cover" src="https://github.com/aryanmsr/Mobile_Game_Analysis/blob/master/mobile_game_cover.jpg" width=500 />
 </div>
