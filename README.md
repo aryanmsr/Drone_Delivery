@@ -40,14 +40,12 @@ The main idea of our algorithm is the following:
 
 ## Some Visuals
 <div class="row">
-  <div class="column" align="left">
-    <img alt="Cover" src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" width=500 />
+  <div class="column">
+    <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig1" style="width:100%">
   </div>
-  <div class="column" align ="right>
-    <img alt="Cover" src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" width=500 />
+  <div class="column">
+    <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig2" style="width:100%">
   </div>
- </div>
-  
-    
+</div>
 
 
