@@ -39,11 +39,12 @@ The main idea of our algorithm is the following:
 </ol>
 
 ## Some Visuals
-<div>
-<div align="left">
+<div class="row">
+<div class="column">
   <img alt="Cover" src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" width=500 />
 </div>
-<div align="right">
+<div class="column">
   <img alt="Cover" src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" width=500 />
 </div>
   </div>
+
