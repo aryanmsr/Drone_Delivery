@@ -39,3 +39,6 @@ The main idea of our algorithm is the following:
 </ol>
 
 ## Some Visuals
+<div align="left">
+  <img alt="Cover" src="https://github.com/aryanmsr/Mobile_Game_Analysis/blob/master/mobile_game_cover.jpg" width=100 />
+</div>
