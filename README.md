@@ -39,14 +39,6 @@ The main idea of our algorithm is the following:
 </ol>
 
 ## Some Visuals
-<div class="row">
-  <div class="column">
-    <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig1" width = 500>
-  </div>
-  <div class="column">
-    <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig2" width = 500>
-  </div>
-</div>
 
 <figure class="half">
   <table>
@@ -59,5 +51,5 @@ The main idea of our algorithm is the following:
       </td>
     </tr>
   </table>
-  <figcaption>Caption describing these two images.</figcaption>
+  <figcaption>Plots visualizing drones and orders.</figcaption>
 </figure>
