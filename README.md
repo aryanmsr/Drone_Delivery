@@ -53,3 +53,9 @@ The main idea of our algorithm is the following:
   </table>
   <figcaption>Plots visualizing drones and orders.</figcaption>
 </figure>
+
+----[link](https://www.example.com/my%20great%20page)
+
+<a href="https://www.example.com/my great page">link</a>
+
+To check out the final notebook containing all the code, go to [link] (https://github.com/aryanmsr/Drone_Delivery/blob/main/Notebooks/hash-code-drone-delivery.ipynb) 
