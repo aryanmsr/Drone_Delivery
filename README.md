@@ -48,4 +48,16 @@ The main idea of our algorithm is the following:
   </div>
 </div>
 
-
+<figure class="half">
+  <table>
+    <tr>
+      <td>
+        <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig1" width = 500>
+      </td>
+      <td>
+        <img src="https://github.com/aryanmsr/Drone_Delivery/blob/main/Screen%20Shot%202022-01-13%20at%2012.16.45%20AM.png" alt="fig2" width = 500>
+      </td>
+    </tr>
+  </table>
+  <figcaption>Caption describing these two images.</figcaption>
+</figure>
