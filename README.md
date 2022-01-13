@@ -3,7 +3,7 @@
 </h1>
 
 <div align="center">
-  <img alt="Cover" src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.forbes.com%2Fsites%2Fworldeconomicforum%2F2020%2F09%2F05%2Fthe-race-for-drone-delivery-just-got-a-new-leader-3-key-differences-that-will-define-who-wins%2F&psig=AOvVaw2RIC53qFWFXkij_VQtfV3N&ust=1642139162456000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMj_2Z2DrvUCFQAAAAAdAAAAABAE" />
+  <img alt="Cover" src="https://github.com/aryanmsr/Drone_Delivery/blob/main/bot.png" />
 </div>
 
 [Final Notebook containing all of the code](https://github.com/aryanmsr/Drone_Delivery/blob/main/Notebooks/hash-code-drone-delivery.ipynb)
