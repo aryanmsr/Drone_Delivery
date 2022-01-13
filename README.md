@@ -30,9 +30,9 @@ order_info, int - list of len n_orders, each element [order_loc, n_order_items, 
 Example: the first order order_info[0] = [[340, 371], [8], [226, 183, 6, 220, 299, 280, 12, 42]]
 
 ## General approach
-The main idea of the algorithm is the following:\ 
+The main idea of the algorithm is the following: 
 <ol>
-  <li>Each drone finds the nearest warehouse and goes there\</li>
+  <li>Each drone finds the nearest warehouse and goes there.</li>
   <li>Next, the drone finds the nearest order whose products are available at the current warehouse and gets assigned to that order</li> 
   <li>The drone takes the products available at the warehouse and if it has some spare space ('remainder') it looks for another nearest warehouse with the products needed for the current order. If there's such a warehouse then the drone goes there to pick up the missing products types </li>
   <li>The drone delivers the order (the order may be still incomplete) and again looks for the nearest warehouse</li>
